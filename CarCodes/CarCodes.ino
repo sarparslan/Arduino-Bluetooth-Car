@@ -1,44 +1,124 @@
-hvoid setup() {
-  pinMode(13, OUTPUT); // left motors forward
-  pinMode(12, OUTPUT); // left motors reverse
-  pinMode(11, OUTPUT); // right motors forward
-  pinMode(10, OUTPUT); // right motors reverse
-  pinMode(9, OUTPUT);  // LED
+const int motorA1 = 11;  // Input IN3 of L298N
+const int motorA2 = 13;  // Input IN1 of L298N
+const int motorB1 = 12;  // Input IN2 of L298N
+const int motorB2 = 10;  // Input IN4 of L298N
+int state;                // Variable for signal from Bluetooth device
+int vSpeed = 255;         // Standard Speed, can take a value between 0-255
+
+void setup() {
+  pinMode(motorA1, OUTPUT);
+  pinMode(motorA2, OUTPUT);
+  pinMode(motorB1, OUTPUT);
+  pinMode(motorB2, OUTPUT);    
   Serial.begin(9600);
 }
 
 void loop() {
-  if (Serial.available()) {
-    char t = Serial.read();
-    Serial.println(t);
-    
-    // Stop all motors before executing any new command
-    digitalWrite(13, LOW);
-    digitalWrite(12, LOW);
-    digitalWrite(11, LOW);
-    digitalWrite(10, LOW);
-    
-    if (t == 'F') { // move forward
-      Serial.println("İleri");
-      digitalWrite(13, HIGH);
-      digitalWrite(11, HIGH);
-    } else if (t == 'B') { // move reverse
-      digitalWrite(12, HIGH);
-      digitalWrite(10, HIGH);
-    } else if (t == 'L') { // turn left
-      digitalWrite(12, HIGH);
-      digitalWrite(11, HIGH);
-    } else if (t == 'R') { // turn right
-      digitalWrite(13, HIGH);
-      digitalWrite(10, HIGH);
-    } 
-    } else if (t == 'S') { // stop
-      digitalWrite(13, LOW);
-      digitalWrite(12, LOW);
-      digitalWrite(11, LOW);
-      digitalWrite(10, LOW);
-    }
+  // Check for Bluetooth data
+  if (Serial.available() > 0) {
+    state = Serial.read();
+    executeCommand(state);
   }
+}
 
-  delay(100);
+// Functions are designed for each command with a movement duration limited to 1 second
+void executeCommand(char command) {
+  if (command == 'F') {
+    goForward();
+  } else if (command == 'G') {
+    goForwardLeft();
+  } else if (command == 'I') {
+    goForwardRight();
+  } else if (command == 'B') {
+    goBackward();
+  } else if (command == 'H') {
+    goBackwardLeft();
+  } else if (command == 'J') {
+    goBackwardRight();
+  } else if (command == 'L') {
+    goLeft();
+  } else if (command == 'R') {
+    goRight();
+  } else if (command == 'S') {
+    stopCar();
+  }
+}
+
+void goForward() {
+  analogWrite(motorA1, vSpeed);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, vSpeed);
+  analogWrite(motorB2, 0);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goForwardLeft() {
+  analogWrite(motorA1, vSpeed);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, 100);
+  analogWrite(motorB2, 0);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goForwardRight() {
+  analogWrite(motorA1, 100);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, vSpeed);
+  analogWrite(motorB2, 0);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goBackward() {
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, vSpeed);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, vSpeed);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goBackwardLeft() {
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 100);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, vSpeed);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goBackwardRight() {
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, vSpeed);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 100);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goLeft() {
+  analogWrite(motorA1, vSpeed);
+  analogWrite(motorA2, 150);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 0);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void goRight() {
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, vSpeed);
+  analogWrite(motorB2, 150);
+  delay(1000);  // Movement duration of 1 second
+  stopCar();
+}
+
+void stopCar() {
+  analogWrite(motorA1, 0);
+  analogWrite(motorA2, 0);
+  analogWrite(motorB1, 0);
+  analogWrite(motorB2, 0);
 }
