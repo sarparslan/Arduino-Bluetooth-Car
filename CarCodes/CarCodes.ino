@@ -1,13 +1,22 @@
+
 // L298N Connection
 const int motorA1 = 5;   // IN3 input of L298N
 const int motorA2 = 6;   // IN1 input of L298N
 const int motorB1 = 10;  // IN2 input of L298N
 const int motorB2 = 9;   // IN4 input of L298N
 
-int state;               // Variable for signal from Bluetooth device
-int vSpeed = 235;        // Default speed, can be between 0-255
+const int trigPin = 3;
+const int echoPin = 4;
+long duration, distance;
+
+
+int state = -1;               // Variable for signal from Bluetooth device
+int vSpeed = 180;        // Default speed, can be between 0-255
 
 void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
   // Define pins as outputs
   pinMode(motorA1, OUTPUT);
   pinMode(motorA2, OUTPUT);
@@ -19,14 +28,31 @@ void setup() {
 }
 
 void loop() {
+  
   // Check if there is data available from Bluetooth
   if (Serial.available() > 0) {
     state = Serial.read();   // Read incoming data
   }
+  // setSpeed(state);
+  setHcSR04();
 
-  // Set speed levels based on received data
-  /*
-  switch (state) {
+  if(distance < 15){
+    Serial.print("distance : ");
+    Serial.println(distance);
+    goReverse();
+    delay(1000);
+    stopMotors();
+  }
+
+  else{
+    executeCommand(state);
+    Serial.print("state ");
+    Serial.println(state);
+  }
+ }
+
+void setSpeed(int state){
+   switch (state) {
     case '0':
       vSpeed = 0;
       break;
@@ -43,37 +69,29 @@ void loop() {
       vSpeed = 255;
       break;
   }
-  */
+}
 
-  // Movement controls based on received command
+void setHcSR04(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);  
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration/58.2;
+}
+
+void executeCommand(int state) {
   switch (state) {
-    case 8:
-      goForward();
-      break;
-    case 1:
-      goForwardLeft();
-      break;
-    case 2:
-      goForwardRight();
-      break;
-    case 3:
-      goReverse();
-      break;
-    case 4:
-      goReverseLeft();
-      break;
-    case 5:
-      goReverseRight();
-      break;
-    case 6:
-      turnLeft();
-      break;
-    case 7:
-      turnRight();
-      break;
-    case 0:
-      stopMotors();
-      break;
+    case 0: goForward(); break;
+    case 1: goForwardLeft(); break;
+    case 2: goForwardRight(); break;
+    case 3: goReverse(); break;
+    case 4: goReverseLeft(); break;
+    case 5: goReverseRight(); break;
+    case 6: turnLeft(); break;
+    case 7: turnRight(); break;
+    case 8: stopMotors(); break;
   }
 }
 
