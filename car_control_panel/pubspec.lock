@@ -86,6 +86,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.8.0"
+  flutter_bluetooth_serial:
+    dependency: "direct main"
+    description:
+      name: flutter_bluetooth_serial
+      sha256: "248608f777e92e867b642c88327c030fd5eacafb9841d4aa3e34d04ae314de20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.2"
   flutter_joystick:
     dependency: "direct main"
     description:
@@ -242,4 +250,4 @@ packages:
     version: "0.3.0"
 sdks:
   dart: ">=3.2.6 <4.0.0"
-  flutter: ">=1.12.13+hotfix.6"
+  flutter: ">=1.17.0"
