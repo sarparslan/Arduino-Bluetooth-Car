@@ -1,6 +1,6 @@
 import 'package:car_control_panel/controlScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BluetoothDeviceScreen extends StatefulWidget {
   @override
@@ -8,66 +8,90 @@ class BluetoothDeviceScreen extends StatefulWidget {
 }
 
 class _BluetoothDeviceScreenState extends State<BluetoothDeviceScreen> {
-  FlutterBlue flutterBlue = FlutterBlue.instance;
   List<BluetoothDevice> devicesList = [];
 
   @override
   void initState() {
     super.initState();
-    flutterBlue.startScan(timeout: Duration(seconds: 4));
+    startScan();
+  }
 
-    flutterBlue.scanResults.listen((results) {
-      for (ScanResult result in results) {
-        if (!devicesList.contains(result.device)) {
+  void startScan() {
+    setState(() {
+      devicesList.clear(); // Eski sonuçları temizle
+    });
+    print("Starting scan for devices...");
+    FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
+
+    FlutterBluePlus.scanResults.listen((results) {
+      for (ScanResult r in results) {
+        print("Found device: ${r.device.name} (${r.device.id})");
+        if (!devicesList.contains(r.device)) {
           setState(() {
-            devicesList.add(result.device);
+            devicesList.add(r.device);
           });
         }
       }
     });
-
-    flutterBlue.stopScan();
   }
 
   void connectToDevice(BluetoothDevice device) async {
     try {
+      print("Trying to connect to device: ${device.name}");
       await device.connect();
+      print("Connected to device: ${device.name}");
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ControlScreen(device: device)));
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Error"),
-          content: Text("Failed to connect."),
-          actions: <Widget>[
-            ElevatedButton(
-              child: Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
+        context,
+        MaterialPageRoute(
+          builder: (context) => ControlScreen(device: device),
         ),
       );
+    } catch (e) {
+      print("Error connecting to device: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Available Bluetooth Devices')),
+      appBar: AppBar(
+        title: Text('Available Bluetooth Devices'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              startScan();
+            },
+          ),
+        ],
+      ),
       body: ListView.builder(
         itemCount: devicesList.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(devicesList[index].name),
-            subtitle: Text(devicesList[index].id.toString()),
-            trailing: ElevatedButton(
-              child: Text('Connect'),
-              onPressed: () => connectToDevice(devicesList[index]),
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            color: Colors.blue[50],
+            child: ListTile(
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+              title: Text(
+                devicesList[index].name.isNotEmpty
+                    ? devicesList[index].name
+                    : 'Unknown Device',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.blue[900]),
+              ),
+              subtitle: Text(
+                devicesList[index].id.toString(),
+                style: TextStyle(color: Colors.blue[700]),
+              ),
+              trailing: ElevatedButton(
+                onPressed: () => connectToDevice(devicesList[index]),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                ),
+                child: Text('Connect'),
+              ),
             ),
           );
         },
