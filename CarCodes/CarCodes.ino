@@ -11,7 +11,7 @@ long duration, distance;
 
 
 int state = -1;               // Variable for signal from Bluetooth device
-int vSpeed = 180;        // Default speed, can be between 0-255
+int vSpeed = 255;        // Default speed, can be between 0-255
 
 void setup() {
   pinMode(trigPin, OUTPUT);
@@ -26,13 +26,15 @@ void setup() {
   // Start serial communication at 9600 baud
   Serial.begin(9600);
 }
-
 void loop() {
   
   // Check if there is data available from Bluetooth
-  if (Serial.available() > 0) {
-    state = Serial.read();   // Read incoming data
-  }
+ if (Serial.available() > 0) {
+  state = Serial.read();
+  Serial.print("Received state: ");
+  Serial.println(state);
+}
+
   // setSpeed(state);
   setHcSR04();
 
@@ -45,32 +47,9 @@ void loop() {
   }
 
   else{
-    executeCommand(state);
-    Serial.print("state ");
-    Serial.println(state);
+      executeCommand(state);
   }
  }
-
-void setSpeed(int state){
-   switch (state) {
-    case '0':
-      vSpeed = 0;
-      break;
-    case '1':
-      vSpeed = 100;
-      break;
-    case '2':
-      vSpeed = 180;
-      break;
-    case '3':
-      vSpeed = 200;
-      break;
-    case '4':
-      vSpeed = 255;
-      break;
-  }
-}
-
 void setHcSR04(){
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -80,6 +59,7 @@ void setHcSR04(){
   duration = pulseIn(echoPin, HIGH);
   distance = duration/58.2;
 }
+
 
 void executeCommand(int state) {
   switch (state) {

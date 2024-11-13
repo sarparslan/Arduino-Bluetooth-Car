@@ -18,7 +18,7 @@ class _BluetoothDeviceScreenState extends State<BluetoothDeviceScreen> {
 
   void startScan() {
     setState(() {
-      devicesList.clear(); // Eski sonuçları temizle
+      devicesList.clear();
     });
     print("Starting scan for devices...");
     FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
@@ -37,9 +37,23 @@ class _BluetoothDeviceScreenState extends State<BluetoothDeviceScreen> {
 
   void connectToDevice(BluetoothDevice device) async {
     try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
       print("Trying to connect to device: ${device.name}");
       await device.connect();
       print("Connected to device: ${device.name}");
+      print("isConected -> " + device.isConnected.toString());
+      print("isDisconected -> " + device.isDisconnected.toString());
+      Navigator.pop(context);
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -47,6 +61,7 @@ class _BluetoothDeviceScreenState extends State<BluetoothDeviceScreen> {
         ),
       );
     } catch (e) {
+      Navigator.pop(context);
       print("Error connecting to device: $e");
     }
   }
@@ -90,7 +105,10 @@ class _BluetoothDeviceScreenState extends State<BluetoothDeviceScreen> {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.blue,
                 ),
-                child: Text('Connect'),
+                child: Text(
+                  'Connect',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           );
