@@ -13,6 +13,11 @@ This project is a Bluetooth-controlled car system powered by an Arduino and cont
 
 *Figure 1: Complete Car Setup with Arduino and L298N Motor Driver*
 
+### Video
+
+![Demo GIF](https://github.com/sarparslan/Arduino-Bluetooth-Car/blob/main/ezgif-3-64af0fb433.gif)
+
+*Figure 2: Demo Video Showing the Car in Action*
 
 
 ---
