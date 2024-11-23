@@ -38,8 +38,9 @@ Below is the circuit schema of the car control system, including the Arduino, L2
 
 1. **Arduino** - Controls the car's movements based on received Bluetooth commands.
 2. **L298N Motor Driver** - Powers and controls the car's motors.
-3. **Ultrasonic Sensor (HC-SR04)** - Measures distance to obstacles and prevents collisions.
-4. **Flutter Application** - Provides a graphical interface for controlling the car via Bluetooth.
+3. **Ultrasonic Sensor HC-SR04** - Measures distance to obstacles and prevents collisions.
+4. **HC-08 Bluetooth Module** - Enables wireless communication between the Arduino and the Flutter application.
+5. **Flutter Application** - Provides a graphical interface for controlling the car via Bluetooth.
 
 ## Hardware Connections
 
